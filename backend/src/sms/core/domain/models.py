@@ -5,16 +5,20 @@ from enum import Enum
 
 @dataclass
 class BaseEntityMixin:
-    id: int
+    id: int | None
     created_at: datetime
     updated_at: datetime | None
     deleted_at: datetime | None
 
 
 @dataclass
-class Brand(BaseEntityMixin):
+class Brand:
+    id: int | None
     name: str
     description: str | None
+    created_at: datetime
+    updated_at: datetime | None
+    deleted_at: datetime | None
 
 
 @dataclass
@@ -31,14 +35,6 @@ class ProductVariant(BaseEntityMixin):
     cost: float
     price: float
     image: str | None
-    qty: float
-
-
-@dataclass
-class ProductWarehouse(BaseEntityMixin):
-    product_id: int
-    warehouse_id: int
-    product_variant_id: int | None
     qty: float
 
 
@@ -62,25 +58,9 @@ class Product(BaseEntityMixin):
     tax_net: float | None
     tax_method: str
     image: str | None
+    qty: float
     description: str | None
     stock_alert: float | None
     has_variant: bool
     is_for_sale: bool
     is_active: bool
-
-
-@dataclass
-class Unit(BaseEntityMixin):
-    base_unit_id: int | None
-    name: str
-    short_name: str
-    operator: str | None
-    operator_value: str | None
-
-
-@dataclass
-class Warehouse(BaseEntityMixin):
-    name: str
-    city: str | None
-    mobile: str | None
-    email: str | None

@@ -1,4 +1,5 @@
 alembic==1.13.2
+annotated-types==0.7.0
 async-timeout==4.0.3
 asyncpg==0.29.0
 autoflake==2.3.1
@@ -16,8 +17,12 @@ packaging==24.1
 pathspec==0.12.1
 platformdirs==4.2.2
 pluggy==1.5.0
+pydantic==2.8.2
+pydantic_core==2.20.1
 pyflakes==3.2.0
 pytest==8.3.2
+pytest-asyncio==0.24.0
+pytz==2024.1
 six==1.16.0
 SQLAlchemy==2.0.32
 tomli==2.0.1
