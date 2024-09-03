@@ -5,7 +5,9 @@ class Settings:
     if os.getenv("TEST_RUN"):
         db_uri = "postgresql+asyncpg://postgres:postgres@localhost:5436/postgres"
     else:
-        db_uri = "postgresql+asyncpg://postgres:postgres@localhost:5435/postgres"
+        db_uri = os.getenv(
+            "DATABASE_URL", "postgresql+asyncpg://postgres:postgres@db:5435/postgres"
+        )
 
 
 def get_database_uri() -> str:
