@@ -6,7 +6,9 @@ from src.sms.core.exceptions import EntityNotFound, UniqueViolation
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_create_brand(get_brand_service_impl, init_container):
-    dto = CreateBrandDTO(name="service_brand_name", description="service_brand_description")
+    dto = CreateBrandDTO(
+        name="service_brand_name", description="service_brand_description"
+    )
     result = await get_brand_service_impl.create(dto)
     assert result.id is not None
     assert result.name == "service_brand_name"
@@ -38,7 +40,9 @@ async def test_update_brand(get_brand_service_impl):
     the_only_brand_id = the_only_brand.id
     # No data updated
     dto = UpdateBrandDTO(
-        id=the_only_brand_id, name=the_only_brand.name, description=the_only_brand.description
+        id=the_only_brand_id,
+        name=the_only_brand.name,
+        description=the_only_brand.description,
     )
     result = await get_brand_service_impl.update(dto)
     assert result == the_only_brand
@@ -72,8 +76,13 @@ async def test_update_brand(get_brand_service_impl):
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_delete_the_second_brand(get_brand_service_impl):
-    existed_brands_before_delete = await get_brand_service_impl.find_all(page=1, size=10)
+    existed_brands_before_delete = await get_brand_service_impl.find_all(
+        page=1, size=10
+    )
     second_brand = await get_brand_service_impl.find_by_id(2)
     await get_brand_service_impl.delete(second_brand.id)
     existed_brands_after_delete = await get_brand_service_impl.find_all(page=1, size=10)
-    assert len(existed_brands_after_delete.items) == len(existed_brands_before_delete.items) - 1
+    assert (
+        len(existed_brands_after_delete.items)
+        == len(existed_brands_before_delete.items) - 1
+    )
