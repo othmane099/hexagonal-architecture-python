@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 
 from fastapi_pagination import Page
 
-from src.sms.core.domain.dtos import CreateBrandDTO, BrandResponseDTO, UpdateBrandDTO
+from src.sms.core.domain.dtos import (BrandResponseDTO, CreateBrandDTO,
+                                      UpdateBrandDTO)
 
 
 class BrandService(ABC):

@@ -1,6 +1,6 @@
 PYTHON=./.venv/bin/python
 
-PHONY = help install format test migrations migrate
+PHONY = help install format test migrations migrate run
 
 help:
 	@echo "---------------HELP-----------------"
@@ -9,6 +9,7 @@ help:
 	@echo "To test the project type -> make test"
 	@echo "To create database migrations type -> make migrations"
 	@echo "To run database migrations type -> make migrate"
+	@echo "To run the project type -> make run"
 	@echo "------------------------------------"
 
 
@@ -28,3 +29,6 @@ migrations:
 
 migrate:
 	alembic -c alembic.ini upgrade head
+
+run:
+	${PYTHON} -m uvicorn src.sms.adapters.entry_points.api.app:app --host 0.0.0.0 --port 8000 --reload
