@@ -23,6 +23,12 @@ class CreateBrandDTO(GlobalConfigDictMixin, BaseModel):
     description: str | None = None
 
 
+class UpdateBrandDTO(GlobalConfigDictMixin, BaseModel):
+    id: int
+    name: str
+    description: str | None = None
+
+
 class BrandResponseDTO(GlobalConfigDictMixin, BaseModel):
     id: int
     name: str

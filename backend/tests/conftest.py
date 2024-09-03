@@ -7,6 +7,18 @@ from src.sms.core.services.brand import BrandServiceImpl
 
 
 @pytest_asyncio.fixture(scope="session")
+async def drop_and_create_database():
+    async with ENGINE.begin() as conn:
+        await conn.run_sync(metadata.drop_all)
+        await conn.run_sync(metadata.create_all)
+
+
+@pytest_asyncio.fixture(scope="session")
+async def init_container():
+    return Container()
+
+
+@pytest_asyncio.fixture(scope="session")
 async def get_container():
     async with ENGINE.begin() as conn:
         await conn.run_sync(metadata.drop_all)
