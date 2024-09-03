@@ -15,7 +15,6 @@ class BaseEntityMixin:
 class Brand(BaseEntityMixin):
     name: str
     description: str | None
-    image: str | None
 
 
 @dataclass
@@ -26,11 +25,12 @@ class Category(BaseEntityMixin):
 
 @dataclass
 class ProductVariant(BaseEntityMixin):
-    product_code: int
+    product_id: int
+    code: str
     name: str
     cost: float
     price: float
-    image: str
+    image: str | None
     qty: float
 
 
