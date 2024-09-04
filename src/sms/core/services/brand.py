@@ -5,6 +5,7 @@ from fastapi_pagination import Page, Params
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 from src.sms.core.domain.dtos import (BrandResponseDTO, CreateBrandDTO,
+                                      DeleteAllByIdsResponseDTO, IdsDTO,
                                       UpdateBrandDTO,
                                       convert_brand_to_brand_response_dto)
 from src.sms.core.domain.models import Brand
@@ -74,4 +75,19 @@ class BrandServiceImpl(BrandService):
                     convert_brand_to_brand_response_dto(row) for row in rows
                 ],
                 params=Params(page=page, size=size),
+            )
+
+    async def delete_all_by_ids(self, dto: IdsDTO) -> DeleteAllByIdsResponseDTO:
+        ids = dto.ids
+        async with self.brand_unit_of_work as uow:
+            brands = await uow.repository.find_all_by_ids(ids)
+            brands_ids = [b.id for b in brands]
+            not_existed_ids = [id_ for id_ in ids if id_ not in brands_ids]
+            for bid in brands_ids:
+                brand = await uow.repository.find_by_id(bid)
+                brand.deleted_at = datetime.now()
+            await uow.commit()
+            return DeleteAllByIdsResponseDTO(
+                not_existed_ids=not_existed_ids,
+                deleted_ids=brands_ids,
             )

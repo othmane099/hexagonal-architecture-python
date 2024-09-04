@@ -21,3 +21,7 @@ class BrandRepository(ABC):
     @abstractmethod
     def get_find_all_stmt(self) -> Select[tuple[Brand]]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def find_all_by_ids(self, ids: list[int]) -> list[Brand]:
+        raise NotImplementedError

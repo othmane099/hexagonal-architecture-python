@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi_pagination import Page
 
 from src.sms.core.domain.dtos import (BrandResponseDTO, CreateBrandDTO,
+                                      DeleteAllByIdsResponseDTO, IdsDTO,
                                       UpdateBrandDTO)
 from src.sms.core.exceptions import EntityNotFound, UniqueViolation
 from src.sms.core.ports.services import BrandService
@@ -88,6 +89,20 @@ async def delete(
         raise HTTPException(status_code=404, detail=e.message)
     return Response(
         content=json.dumps({"detail": "Brand deleted successfully"}),
+        media_type="application/json",
+        status_code=200,
+    )
+
+
+@router.post("/delete-all-by-ids", response_model=None)
+@inject
+async def delete_all_by_ids(
+    dto: IdsDTO,
+    brand_service_impl: BrandService = Depends(Provide["brand_service_impl"]),
+) -> Response:
+    response = await brand_service_impl.delete_all_by_ids(dto)
+    return Response(
+        content=json.dumps({"data": DeleteAllByIdsResponseDTO.model_dump(response)}),
         media_type="application/json",
         status_code=200,
     )

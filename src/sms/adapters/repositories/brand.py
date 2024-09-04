@@ -28,3 +28,9 @@ class BrandRepositoryImpl(BrandRepository):
 
     def get_find_all_stmt(self) -> Select[tuple[Brand]]:
         return select(Brand).filter_by(deleted_at=None).order_by(Brand.name)
+
+    async def find_all_by_ids(self, ids: list[int]) -> list[Brand]:
+        result = await self.session.execute(
+            select(Brand).where(Brand.id.in_(ids), Brand.deleted_at.is_(None))
+        )
+        return result.scalars().all()

@@ -3,7 +3,7 @@ from httpx import ASGITransport, AsyncClient
 from starlette.testclient import TestClient
 
 from src.sms.adapters.entry_points.api.app import app
-from src.sms.core.domain.dtos import CreateBrandDTO, UpdateBrandDTO
+from src.sms.core.domain.dtos import CreateBrandDTO, UpdateBrandDTO, IdsDTO
 
 client = TestClient(app)
 
@@ -82,4 +82,30 @@ async def test_delete(get_brand_service_impl):
     assert (
         len(existed_brand_after_delete.items)
         == len(existed_brand_before_delete.items) - 1
+    )
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_delete_all_by_ids(get_brand_service_impl):
+    dto = CreateBrandDTO(name="test_delete_all_by_ids", description=None)
+    b1 = await get_brand_service_impl.create(dto)
+    dto = CreateBrandDTO(name="test_delete_all_by_ids1", description=None)
+    b2 = await get_brand_service_impl.create(dto)
+    dto = CreateBrandDTO(name="test_delete_all_by_ids2", description=None)
+    b3 = await get_brand_service_impl.create(dto)
+    ids = [b1.id, b2.id, b3.id, 999]
+    dto = IdsDTO(ids=ids)
+    existed_brand_before_delete = await get_brand_service_impl.find_all(page=1, size=10)
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1"
+    ) as ac:
+        response = await ac.post("/api/v1/brands/delete-all-by-ids", json=IdsDTO.model_dump(dto))
+        assert response.status_code == 200
+        assert response.json()["data"]["not_existed_ids"] == [999]
+        assert response.json()["data"]["deleted_ids"] == [b1.id, b2.id, b3.id]
+
+    existed_brand_after_delete = await get_brand_service_impl.find_all(page=1, size=10)
+    assert (
+        len(existed_brand_after_delete.items)
+        == len(existed_brand_before_delete.items) - 3
     )
