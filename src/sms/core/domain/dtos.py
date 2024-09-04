@@ -18,6 +18,16 @@ class GlobalConfigDictMixin:
     model_config = ConfigDict(extra="forbid")
 
 
+class IdsDTO(GlobalConfigDictMixin, BaseModel):
+    ids: list[int]
+
+
+class DeleteAllByIdsResponseDTO(GlobalConfigDictMixin, BaseModel):
+    not_existed_ids: list[int] | None = None
+    existed_not_deleted_ids: list[int] | None = None
+    deleted_ids: list[int] | None
+
+
 class CreateBrandDTO(GlobalConfigDictMixin, BaseModel):
     name: str
     description: str | None = None

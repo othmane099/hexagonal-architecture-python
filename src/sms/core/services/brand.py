@@ -5,6 +5,7 @@ from fastapi_pagination import Page, Params
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 from src.sms.core.domain.dtos import (BrandResponseDTO, CreateBrandDTO,
+                                      DeleteAllByIdsResponseDTO, IdsDTO,
                                       UpdateBrandDTO,
                                       convert_brand_to_brand_response_dto)
 from src.sms.core.domain.models import Brand
@@ -64,9 +65,11 @@ class BrandServiceImpl(BrandService):
             brand = await get_existed_entity_by_id(uow, brand_id)
             return convert_brand_to_brand_response_dto(brand)
 
-    async def find_all(self, page: int, size: int) -> Page[BrandResponseDTO]:
+    async def find_all(
+        self, keyword: str | None, page: int, size: int
+    ) -> Page[BrandResponseDTO]:
         async with self.brand_unit_of_work as uow:
-            stmt = uow.repository.get_find_all_stmt()
+            stmt = uow.repository.get_find_all_stmt(keyword)
             return await paginate(
                 uow.session,
                 stmt,
@@ -74,4 +77,19 @@ class BrandServiceImpl(BrandService):
                     convert_brand_to_brand_response_dto(row) for row in rows
                 ],
                 params=Params(page=page, size=size),
+            )
+
+    async def delete_all_by_ids(self, dto: IdsDTO) -> DeleteAllByIdsResponseDTO:
+        ids = dto.ids
+        async with self.brand_unit_of_work as uow:
+            brands = await uow.repository.find_all_by_ids(ids)
+            brands_ids = [b.id for b in brands]
+            not_existed_ids = [id_ for id_ in ids if id_ not in brands_ids]
+            for bid in brands_ids:
+                brand = await uow.repository.find_by_id(bid)
+                brand.deleted_at = datetime.now()
+            await uow.commit()
+            return DeleteAllByIdsResponseDTO(
+                not_existed_ids=not_existed_ids,
+                deleted_ids=brands_ids,
             )
