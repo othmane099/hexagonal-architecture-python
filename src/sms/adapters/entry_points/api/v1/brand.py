@@ -16,11 +16,12 @@ router = APIRouter()
 @router.get("", response_model=Page[BrandResponseDTO])
 @inject
 async def get_brands(
+    keyword: str | None = None,
     page: int = 1,
     size: int = 20,
     brand_service_impl: BrandService = Depends(Provide["brand_service_impl"]),
 ) -> Page[BrandResponseDTO]:
-    response = await brand_service_impl.find_all(page, size)
+    response = await brand_service_impl.find_all(keyword, page, size)
     return response
 
 

@@ -25,7 +25,9 @@ class BrandService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def find_all(self, page: int, size: int) -> Page[BrandResponseDTO]:
+    async def find_all(
+        self, keyword: str | None, page: int, size: int
+    ) -> Page[BrandResponseDTO]:
         raise NotImplementedError
 
     @abstractmethod

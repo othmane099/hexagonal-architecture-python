@@ -1,4 +1,4 @@
-from sqlalchemy import Select, select
+from sqlalchemy import Select, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.sms.core.domain.models import Brand
@@ -26,8 +26,18 @@ class BrandRepositoryImpl(BrandRepository):
         )
         return result.scalars().first()
 
-    def get_find_all_stmt(self) -> Select[tuple[Brand]]:
-        return select(Brand).filter_by(deleted_at=None).order_by(Brand.name)
+    def get_find_all_stmt(self, keyword: str | None) -> Select[tuple[Brand]]:
+        stmt = select(Brand).filter_by(deleted_at=None)
+
+        if keyword:
+            stmt = stmt.filter(
+                or_(
+                    Brand.name.ilike(f"%{keyword}%"),
+                    Brand.description.ilike(f"%{keyword}%"),
+                )
+            )
+
+        return stmt.order_by(Brand.name)
 
     async def find_all_by_ids(self, ids: list[int]) -> list[Brand]:
         result = await self.session.execute(

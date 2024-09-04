@@ -65,9 +65,11 @@ class BrandServiceImpl(BrandService):
             brand = await get_existed_entity_by_id(uow, brand_id)
             return convert_brand_to_brand_response_dto(brand)
 
-    async def find_all(self, page: int, size: int) -> Page[BrandResponseDTO]:
+    async def find_all(
+        self, keyword: str | None, page: int, size: int
+    ) -> Page[BrandResponseDTO]:
         async with self.brand_unit_of_work as uow:
-            stmt = uow.repository.get_find_all_stmt()
+            stmt = uow.repository.get_find_all_stmt(keyword)
             return await paginate(
                 uow.session,
                 stmt,

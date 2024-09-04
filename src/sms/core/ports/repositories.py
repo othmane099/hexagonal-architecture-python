@@ -19,7 +19,7 @@ class BrandRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_find_all_stmt(self) -> Select[tuple[Brand]]:
+    def get_find_all_stmt(self, keyword: str | None) -> Select[tuple[Brand]]:
         raise NotImplementedError
 
     @abstractmethod
