@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from sqlalchemy import Select
 
 from src.sms.core.domain.models import Brand
+from src.sms.helpers import SortDirection
 
 
 class BrandRepository(ABC):
@@ -19,7 +20,9 @@ class BrandRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_find_all_stmt(self, keyword: str | None) -> Select[tuple[Brand]]:
+    def get_find_all_stmt(
+        self, keyword: str | None, sort_column: str, direction: SortDirection
+    ) -> Select[tuple[Brand]]:
         raise NotImplementedError
 
     @abstractmethod

@@ -9,6 +9,7 @@ from src.sms.core.domain.dtos import (BrandResponseDTO, CreateBrandDTO,
                                       UpdateBrandDTO)
 from src.sms.core.exceptions import EntityNotFound, UniqueViolation
 from src.sms.core.ports.services import BrandService
+from src.sms.helpers import SortDirection
 
 router = APIRouter()
 
@@ -19,9 +20,13 @@ async def get_brands(
     keyword: str | None = None,
     page: int = 1,
     size: int = 20,
+    sort_column: str = "name",
+    sort_dir: SortDirection = SortDirection.ASC,
     brand_service_impl: BrandService = Depends(Provide["brand_service_impl"]),
 ) -> Page[BrandResponseDTO]:
-    response = await brand_service_impl.find_all(keyword, page, size)
+    response = await brand_service_impl.find_all(
+        keyword, page, size, sort_column, sort_dir
+    )
     return response
 
 

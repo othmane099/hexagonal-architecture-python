@@ -4,6 +4,7 @@ from starlette.testclient import TestClient
 
 from src.sms.adapters.entry_points.api.app import app
 from src.sms.core.domain.dtos import CreateBrandDTO, IdsDTO, UpdateBrandDTO
+from src.sms.helpers import SortDirection
 
 client = TestClient(app)
 
@@ -24,7 +25,9 @@ async def test_create(drop_and_create_database):
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_update(get_brand_service_impl):
-    brands = await get_brand_service_impl.find_all(keyword=None, page=1, size=10)
+    brands = await get_brand_service_impl.find_all(
+        keyword=None, page=1, size=10, sort_column="name", sort_dir=SortDirection.ASC
+    )
     existed_brand = brands.items[0]
     dto = UpdateBrandDTO(
         id=existed_brand.id,
@@ -45,13 +48,46 @@ async def test_update(get_brand_service_impl):
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_get_brands(get_brand_service_impl):
-    brands = await get_brand_service_impl.find_all(keyword=None, page=1, size=10)
+    brands = await get_brand_service_impl.find_all(
+        keyword=None, page=1, size=10, sort_column="name", sort_dir=SortDirection.ASC
+    )
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
         response = await ac.get("/api/v1/brands?page=1&size=10")
         assert response.status_code == 200
         assert len(response.json()["items"]) == len(brands.items)
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_brands_sorting_and_direction(get_brand_service_impl):
+    dto = CreateBrandDTO(name="one_more_brand", description=None)
+    await get_brand_service_impl.create(dto)
+    dto = CreateBrandDTO(name="one_more_brand1", description=None)
+    await get_brand_service_impl.create(dto)
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1"
+    ) as ac:
+        response = await ac.get(
+            "/api/v1/brands?page=1&size=10&sort_column=id&sort_dir=asc"
+        )
+        items = response.json()["items"]
+        first_item = items[0]
+        last_item = items[-1]
+        assert response.status_code == 200
+        assert first_item.get("id") < last_item.get("id")
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1"
+    ) as ac:
+        response = await ac.get(
+            "/api/v1/brands?page=1&size=10&sort_column=id&sort_dir=desc"
+        )
+        items = response.json()["items"]
+        first_item = items[0]
+        last_item = items[-1]
+        assert response.status_code == 200
+        assert first_item.get("id") > last_item.get("id")
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -109,7 +145,7 @@ async def test_get_brand(get_brand_service_impl):
 @pytest.mark.asyncio(loop_scope="session")
 async def test_delete(get_brand_service_impl):
     existed_brand_before_delete = await get_brand_service_impl.find_all(
-        keyword=None, page=1, size=10
+        keyword=None, page=1, size=10, sort_column="name", sort_dir=SortDirection.ASC
     )
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
@@ -119,7 +155,7 @@ async def test_delete(get_brand_service_impl):
         assert response.json()["detail"] == "Brand deleted successfully"
 
     existed_brand_after_delete = await get_brand_service_impl.find_all(
-        keyword=None, page=1, size=10
+        keyword=None, page=1, size=10, sort_column="name", sort_dir=SortDirection.ASC
     )
     assert (
         len(existed_brand_after_delete.items)
@@ -138,7 +174,7 @@ async def test_delete_all_by_ids(get_brand_service_impl):
     ids = [b1.id, b2.id, b3.id, 999]
     dto = IdsDTO(ids=ids)
     existed_brand_before_delete = await get_brand_service_impl.find_all(
-        keyword=None, page=1, size=10
+        keyword=None, page=1, size=10, sort_column="name", sort_dir=SortDirection.ASC
     )
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
@@ -151,7 +187,7 @@ async def test_delete_all_by_ids(get_brand_service_impl):
         assert response.json()["data"]["deleted_ids"] == [b1.id, b2.id, b3.id]
 
     existed_brand_after_delete = await get_brand_service_impl.find_all(
-        keyword=None, page=1, size=10
+        keyword=None, page=1, size=10, sort_column="name", sort_dir=SortDirection.ASC
     )
     assert (
         len(existed_brand_after_delete.items)

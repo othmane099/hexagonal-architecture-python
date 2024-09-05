@@ -5,6 +5,7 @@ from fastapi_pagination import Page
 from src.sms.core.domain.dtos import (BrandResponseDTO, CreateBrandDTO,
                                       DeleteAllByIdsResponseDTO, IdsDTO,
                                       UpdateBrandDTO)
+from src.sms.helpers import SortDirection
 
 
 class BrandService(ABC):
@@ -26,7 +27,12 @@ class BrandService(ABC):
 
     @abstractmethod
     async def find_all(
-        self, keyword: str | None, page: int, size: int
+        self,
+        keyword: str | None,
+        page: int,
+        size: int,
+        sort_column: str,
+        sort_dir: SortDirection,
     ) -> Page[BrandResponseDTO]:
         raise NotImplementedError
 
