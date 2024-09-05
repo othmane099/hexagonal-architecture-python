@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.sms.core.domain.models import Brand
 from src.sms.core.ports.repositories import BrandRepository
+from src.sms.helpers import SortDirection, get_column, order_by_column
 
 
 class BrandRepositoryImpl(BrandRepository):
@@ -26,7 +27,9 @@ class BrandRepositoryImpl(BrandRepository):
         )
         return result.scalars().first()
 
-    def get_find_all_stmt(self, keyword: str | None) -> Select[tuple[Brand]]:
+    def get_find_all_stmt(
+        self, keyword: str | None, sort_column: str, direction: SortDirection
+    ) -> Select[tuple[Brand]]:
         stmt = select(Brand).filter_by(deleted_at=None)
 
         if keyword:
@@ -36,8 +39,11 @@ class BrandRepositoryImpl(BrandRepository):
                     Brand.description.ilike(f"%{keyword}%"),
                 )
             )
+        column = get_column(Brand, sort_column)
+        if column:
+            stmt = stmt.order_by(order_by_column(column, direction))
 
-        return stmt.order_by(Brand.name)
+        return stmt
 
     async def find_all_by_ids(self, ids: list[int]) -> list[Brand]:
         result = await self.session.execute(

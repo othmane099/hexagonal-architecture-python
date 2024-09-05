@@ -39,6 +39,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    - name: Format code
+      run: |
+        python -m isort src tests --force-single-line-imports
+        python -m autoflake --remove-all-unused-imports --recursive --remove-unused-variables --in-place src --exclude=__init__.py
+        python -m black src tests --config pyproject.toml
+        python -m isort src tests
     - name: Test with pytest
       env:
         TEST_RUN: "TRUE"

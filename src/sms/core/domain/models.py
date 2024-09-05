@@ -12,13 +12,9 @@ class BaseEntityMixin:
 
 
 @dataclass
-class Brand:
-    id: int | None
+class Brand(BaseEntityMixin):
     name: str
     description: str | None
-    created_at: datetime
-    updated_at: datetime | None
-    deleted_at: datetime | None
 
 
 @dataclass

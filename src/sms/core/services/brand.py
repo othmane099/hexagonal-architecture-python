@@ -12,7 +12,7 @@ from src.sms.core.domain.models import Brand
 from src.sms.core.exceptions import UniqueViolation
 from src.sms.core.ports.services import BrandService
 from src.sms.core.ports.unit_of_works import BrandUnitOfWork
-from src.sms.helpers import get_existed_entity_by_id
+from src.sms.helpers import SortDirection, get_existed_entity_by_id
 
 
 class BrandServiceImpl(BrandService):
@@ -66,10 +66,15 @@ class BrandServiceImpl(BrandService):
             return convert_brand_to_brand_response_dto(brand)
 
     async def find_all(
-        self, keyword: str | None, page: int, size: int
+        self,
+        keyword: str | None,
+        page: int,
+        size: int,
+        sort_column: str,
+        sort_dir: SortDirection,
     ) -> Page[BrandResponseDTO]:
         async with self.brand_unit_of_work as uow:
-            stmt = uow.repository.get_find_all_stmt(keyword)
+            stmt = uow.repository.get_find_all_stmt(keyword, sort_column, sort_dir)
             return await paginate(
                 uow.session,
                 stmt,
