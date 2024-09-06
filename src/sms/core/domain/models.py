@@ -60,3 +60,28 @@ class Product(BaseEntityMixin):
     has_variant: bool
     is_for_sale: bool
     is_active: bool
+
+
+@dataclass
+class Permission(BaseEntityMixin):
+    name: str
+    label: str
+    description: str | None
+
+
+@dataclass
+class Role(BaseEntityMixin):
+    name: str
+    label: str
+    description: str | None
+
+
+@dataclass
+class User(BaseEntityMixin):
+    firstname: str
+    lastname: str
+    username: str
+    email: str
+    password: str
+    phone: str
+    is_active: bool
