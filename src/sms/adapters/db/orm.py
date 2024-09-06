@@ -1,5 +1,5 @@
 from sqlalchemy import (Boolean, Column, DateTime, Enum, Float, ForeignKey,
-                        Integer, MetaData, String, Table, Text)
+                        Integer, MetaData, String, Table, Text, func)
 from sqlalchemy.orm import registry, relationship
 
 from src.sms.core.domain.models import (Brand, Category, Permission, Product,
@@ -17,9 +17,9 @@ brand = Table(
     ),
     Column("name", String, nullable=False),
     Column("description", Text, nullable=True),
-    Column("created_at", DateTime, nullable=False),
-    Column("updated_at", DateTime, nullable=True),
-    Column("deleted_at", DateTime, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
 )
 
 category = Table(
@@ -30,9 +30,9 @@ category = Table(
     ),
     Column("code", String, nullable=False, unique=True),
     Column("name", String, nullable=False, unique=True),
-    Column("created_at", DateTime, nullable=False),
-    Column("updated_at", DateTime, nullable=True),
-    Column("deleted_at", DateTime, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
 )
 
 
@@ -58,9 +58,9 @@ product = Table(
     Column("has_variant", Boolean, nullable=False),
     Column("is_for_sale", Boolean, nullable=False),
     Column("is_active", Boolean, nullable=False),
-    Column("created_at", DateTime, nullable=False),
-    Column("updated_at", DateTime, nullable=True),
-    Column("deleted_at", DateTime, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
 )
 
 product_variant = Table(
@@ -76,9 +76,9 @@ product_variant = Table(
     Column("code", String, nullable=False),
     Column("image", String, nullable=True),
     Column("qty", Float, nullable=False),
-    Column("created_at", DateTime, nullable=False),
-    Column("updated_at", DateTime, nullable=True),
-    Column("deleted_at", DateTime, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
 )
 
 permission = Table(
@@ -90,9 +90,9 @@ permission = Table(
     Column("name", String, nullable=False, unique=True),
     Column("label", String, nullable=False, unique=True),
     Column("description", Text, nullable=True),
-    Column("created_at", DateTime, nullable=False),
-    Column("updated_at", DateTime, nullable=True),
-    Column("deleted_at", DateTime, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
 )
 
 role = Table(
@@ -104,9 +104,9 @@ role = Table(
     Column("name", String, nullable=False, unique=True),
     Column("label", String, nullable=False, unique=True),
     Column("description", Text, nullable=True),
-    Column("created_at", DateTime, nullable=False),
-    Column("updated_at", DateTime, nullable=True),
-    Column("deleted_at", DateTime, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
 )
 
 user = Table(
@@ -122,9 +122,9 @@ user = Table(
     Column("password", String, nullable=False),
     Column("phone", String, nullable=False),
     Column("is_active", Boolean, nullable=False),
-    Column("created_at", DateTime, nullable=False),
-    Column("updated_at", DateTime, nullable=True),
-    Column("deleted_at", DateTime, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
 )
 
 # ==== Many to many ====

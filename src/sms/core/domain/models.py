@@ -6,7 +6,7 @@ from enum import Enum
 @dataclass
 class BaseEntityMixin:
     id: int | None
-    created_at: datetime
+    created_at: datetime | None
     updated_at: datetime | None
     deleted_at: datetime | None
 
