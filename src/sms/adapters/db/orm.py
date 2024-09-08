@@ -35,7 +35,6 @@ category = Table(
     Column("deleted_at", DateTime(timezone=True), nullable=True),
 )
 
-
 product = Table(
     "products",
     mapper_registry.metadata,
@@ -115,6 +114,7 @@ user = Table(
     Column(
         "id", Integer, primary_key=True, unique=True, nullable=False, autoincrement=True
     ),
+    Column("role_id", Integer, ForeignKey("roles.id"), nullable=False),
     Column("firstname", String, nullable=False),
     Column("lastname", String, nullable=False),
     Column("username", String, nullable=False),
@@ -134,13 +134,6 @@ role_permission_association = Table(
     mapper_registry.metadata,
     Column("role_id", Integer, ForeignKey("roles.id"), primary_key=True),
     Column("permission_id", Integer, ForeignKey("permissions.id"), primary_key=True),
-)
-
-user_role_association = Table(
-    "users_roles",
-    mapper_registry.metadata,
-    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("role_id", Integer, ForeignKey("roles.id"), primary_key=True),
 )
 
 
@@ -195,17 +188,13 @@ def start_mappers():
                 secondary=role_permission_association,
                 back_populates="roles",
             ),
-            "users": relationship(
-                "User", secondary=user_role_association, back_populates="roles"
-            ),
+            "users": relationship("User", back_populates="role"),
         },
     )
     mapper_registry.map_imperatively(
         User,
         user,
         properties={
-            "roles": relationship(
-                "Role", secondary=user_role_association, back_populates="users"
-            ),
+            "role": relationship("Role", back_populates="users"),
         },
     )

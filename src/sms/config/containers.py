@@ -40,6 +40,4 @@ class Container(containers.DeclarativeContainer):
         user_unit_of_work=user_unit_of_work,
     )
 
-    authentication_service_impl = providers.Factory(
-        AuthenticationServiceImpl
-    )
+    authentication_service_impl = providers.Factory(AuthenticationServiceImpl)

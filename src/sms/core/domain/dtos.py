@@ -64,6 +64,7 @@ def convert_brand_to_brand_response_dto(brand: Brand) -> BrandResponseDTO:
 
 class UserResponseDTO(GlobalConfigDictMixin, BaseModel):
     id: int
+    role_id: int
     firstname: str
     lastname: str
     username: str
@@ -78,6 +79,7 @@ class UserResponseDTO(GlobalConfigDictMixin, BaseModel):
 def convert_user_to_user_response_dto(user: User) -> UserResponseDTO:
     return UserResponseDTO(
         id=user.id,
+        role_id=user.role_id,
         firstname=user.firstname,
         lastname=user.lastname,
         username=user.username,
@@ -90,5 +92,6 @@ def convert_user_to_user_response_dto(user: User) -> UserResponseDTO:
     )
 
 
+# ========== LOGIN ==========
 class LoginResponseDTO(BaseModel):
     access_token: str

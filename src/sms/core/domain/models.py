@@ -78,6 +78,7 @@ class Role(BaseEntityMixin):
 
 @dataclass
 class User(BaseEntityMixin):
+    role_id: int
     firstname: str
     lastname: str
     username: str
