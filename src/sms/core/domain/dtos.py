@@ -88,3 +88,7 @@ def convert_user_to_user_response_dto(user: User) -> UserResponseDTO:
         updated_at=convert_datetime_to_str(user.updated_at),
         deleted_at=convert_datetime_to_str(user.deleted_at),
     )
+
+
+class LoginResponseDTO(BaseModel):
+    access_token: str

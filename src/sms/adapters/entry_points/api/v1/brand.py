@@ -39,7 +39,7 @@ async def get_brand(
     try:
         response = await brand_service_impl.find_by_id(brand_id)
     except EntityNotFound as e:
-        raise HTTPException(status_code=404, detail=e.message)
+        raise HTTPException(status_code=404, detail=str(e))
     return Response(
         content=json.dumps({"data": BrandResponseDTO.model_dump(response)}),
         media_type="application/json",
@@ -56,7 +56,7 @@ async def create(
     try:
         response = await brand_service_impl.create(dto)
     except UniqueViolation as e:
-        raise HTTPException(status_code=409, detail=e.message)
+        raise HTTPException(status_code=409, detail=str(e))
     return Response(
         content=json.dumps({"data": BrandResponseDTO.model_dump(response)}),
         media_type="application/json",
@@ -73,9 +73,9 @@ async def update(
     try:
         response = await brand_service_impl.update(dto)
     except EntityNotFound as e:
-        raise HTTPException(status_code=404, detail=e.message)
+        raise HTTPException(status_code=404, detail=str(e))
     except UniqueViolation as e:
-        raise HTTPException(status_code=409, detail=e.message)
+        raise HTTPException(status_code=409, detail=str(e))
     return Response(
         content=json.dumps({"data": BrandResponseDTO.model_dump(response)}),
         media_type="application/json",
@@ -92,7 +92,7 @@ async def delete(
     try:
         await brand_service_impl.delete(brand_id)
     except EntityNotFound as e:
-        raise HTTPException(status_code=404, detail=e.message)
+        raise HTTPException(status_code=404, detail=str(e))
     return Response(
         content=json.dumps({"detail": "Brand deleted successfully"}),
         media_type="application/json",

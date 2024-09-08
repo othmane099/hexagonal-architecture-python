@@ -6,6 +6,7 @@ from src.sms.adapters.db.orm import metadata, start_mappers
 from src.sms.config.containers import ENGINE, Container
 from src.sms.core.domain.models import User
 from src.sms.core.services.brand import BrandServiceImpl
+from src.sms.core.services.security import hash_password
 from src.sms.core.services.user import UserServiceImpl
 
 
@@ -39,7 +40,7 @@ async def init_owner():
             lastname="test_owner",
             username="test_owner",
             email="test_owner@example.com",
-            password="123",
+            password=hash_password("123456"),
             phone="0123456789",
             is_active=True,
             created_at=None,
