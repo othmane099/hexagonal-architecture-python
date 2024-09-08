@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from sqlalchemy import Select
 
-from src.sms.core.domain.models import Brand
+from src.sms.core.domain.models import Brand, User
 from src.sms.helpers import SortDirection
 
 
@@ -27,4 +27,11 @@ class BrandRepository(ABC):
 
     @abstractmethod
     async def find_all_by_ids(self, ids: list[int]) -> list[Brand]:
+        raise NotImplementedError
+
+
+class UserRepository(ABC):
+
+    @abstractmethod
+    async def find_by_username(self, username: str) -> User | None:
         raise NotImplementedError

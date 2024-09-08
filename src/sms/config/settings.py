@@ -6,7 +6,8 @@ class Settings:
         db_uri = "postgresql+asyncpg://postgres:postgres@localhost:5436/postgres"
     else:
         db_uri = os.getenv(
-            "DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5435/postgres"
+            "DATABASE_URL",
+            "postgresql+asyncpg://postgres:postgres@localhost:5435/postgres",
         )
 
 

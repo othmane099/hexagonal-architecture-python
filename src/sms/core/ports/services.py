@@ -4,7 +4,7 @@ from fastapi_pagination import Page
 
 from src.sms.core.domain.dtos import (BrandResponseDTO, CreateBrandDTO,
                                       DeleteAllByIdsResponseDTO, IdsDTO,
-                                      UpdateBrandDTO)
+                                      UpdateBrandDTO, UserResponseDTO)
 from src.sms.helpers import SortDirection
 
 
@@ -38,4 +38,11 @@ class BrandService(ABC):
 
     @abstractmethod
     async def delete_all_by_ids(self, dto: IdsDTO) -> DeleteAllByIdsResponseDTO:
+        raise NotImplementedError
+
+
+class UserService(ABC):
+
+    @abstractmethod
+    async def find_by_username(self, username: str) -> UserResponseDTO:
         raise NotImplementedError
