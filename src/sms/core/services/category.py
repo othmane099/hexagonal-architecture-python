@@ -48,15 +48,17 @@ class CategoryServiceImpl(CategoryService):
     async def update(self, dto: UpdateCategoryDTO) -> CategoryResponseDTO:
         async with self.category_unit_of_work as uow:
             category = await get_existed_entity_by_id(uow, dto.id)
-            if category.code != dto.code:
-                if await uow.repository.find_by_code(dto.code):
-                    raise UniqueViolation("Category code should be UNIQUE")
-                category.code = dto.code
-            if category.name != dto.name:
-                if await uow.repository.find_by_name(dto.name):
-                    raise UniqueViolation("Category name should be UNIQUE")
-                category.name = dto.name
-            if category.code != dto.code or category.name != dto.name:
+            if category.name != dto.name or category.code != dto.code:
+                if category.code != dto.code:
+                    tmp_category = await uow.repository.find_by_code(dto.code)
+                    if tmp_category:
+                        raise UniqueViolation("Brand code should be UNIQUE")
+                    category.code = dto.code
+                if category.name != dto.name:
+                    tmp_category = await uow.repository.find_by_name(dto.name)
+                    if tmp_category:
+                        raise UniqueViolation("Brand name should be UNIQUE")
+                    category.name = dto.name
                 category.updated_at = datetime.now()
                 await uow.commit()
             return convert_category_to_category_response_dto(category)

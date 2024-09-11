@@ -36,6 +36,7 @@ async def get_categories(
 @router.get("/{category_id}", response_model=None)
 @inject
 async def get_category(
+    _: Annotated[bool, Depends(has_category_permission)],
     category_id: int,
     category_service_impl: CategoryService = Depends(Provide["category_service_impl"]),
 ) -> Response:
@@ -53,6 +54,7 @@ async def get_category(
 @router.post("", response_model=None)
 @inject
 async def create(
+    _: Annotated[bool, Depends(has_category_permission)],
     dto: CreateCategoryDTO,
     category_service_impl: CategoryService = Depends(Provide["category_service_impl"]),
 ) -> Response:
@@ -70,6 +72,7 @@ async def create(
 @router.put("", response_model=None)
 @inject
 async def update(
+    _: Annotated[bool, Depends(has_category_permission)],
     dto: UpdateCategoryDTO,
     category_service_impl: CategoryService = Depends(Provide["category_service_impl"]),
 ) -> Response:
@@ -89,6 +92,7 @@ async def update(
 @router.delete("/{category_id}", response_model=None)
 @inject
 async def delete(
+    _: Annotated[bool, Depends(has_category_permission)],
     category_id: int,
     category_service_impl: CategoryService = Depends(Provide["category_service_impl"]),
 ) -> Response:
@@ -106,6 +110,7 @@ async def delete(
 @router.post("/delete-all-by-ids", response_model=None)
 @inject
 async def delete_all_by_ids(
+    _: Annotated[bool, Depends(has_category_permission)],
     dto: IdsDTO,
     category_service_impl: CategoryService = Depends(Provide["category_service_impl"]),
 ) -> Response:

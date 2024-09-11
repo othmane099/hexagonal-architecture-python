@@ -5,7 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.sms.adapters.db.orm import metadata, start_mappers
 from src.sms.config.containers import ENGINE, Container
 from src.sms.core.domain.models import Permission, Role, User
+from src.sms.core.ports.services import CategoryService
 from src.sms.core.services.brand import BrandServiceImpl
+from src.sms.core.services.category import CategoryServiceImpl
 from src.sms.core.services.security import hash_password
 from src.sms.core.services.user import UserServiceImpl
 
@@ -34,11 +36,20 @@ async def get_container():
 @pytest_asyncio.fixture(scope="session")
 async def init_owner():
     async with AsyncSession(ENGINE) as session:
-        permission = Permission(
+        brand_perm = Permission(
             id=None,
             name="brand",
             label="Brand",
             description="Brand permission",
+            created_at=None,
+            updated_at=None,
+            deleted_at=None,
+        )
+        category_perm = Permission(
+            id=None,
+            name="category",
+            label="Category",
+            description="Category permission",
             created_at=None,
             updated_at=None,
             deleted_at=None,
@@ -52,7 +63,7 @@ async def init_owner():
             updated_at=None,
             deleted_at=None,
         )
-        role.permissions.append(permission)
+        role.permissions.extend([brand_perm, category_perm])
         session.add(role)
         await session.commit()
         new_user = User(
@@ -82,3 +93,8 @@ def get_brand_service_impl():
 @pytest.fixture(scope="session")
 def get_user_service_impl():
     return UserServiceImpl()
+
+
+@pytest.fixture(scope="session")
+def get_category_service_impl():
+    return CategoryServiceImpl()

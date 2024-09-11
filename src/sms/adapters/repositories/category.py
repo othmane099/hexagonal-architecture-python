@@ -27,6 +27,12 @@ class CategoryRepositoryImpl(CategoryRepository):
         )
         return result.scalars().first()
 
+    async def find_by_code(self, code: str) -> Category | None:
+        result = await self.session.execute(
+            select(Category).filter_by(code=code).filter_by(deleted_at=None)
+        )
+        return result.scalars().first()
+
     def get_find_all_stmt(
         self, keyword: str | None, sort_column: str, direction: SortDirection
     ) -> Select[tuple[Category]]:

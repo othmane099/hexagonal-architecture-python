@@ -71,3 +71,7 @@ class CategoryRepository(ABC):
     @abstractmethod
     async def find_all_by_ids(self, ids: list[int]) -> list[Category]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def find_by_code(self, code: str) -> Category | None:
+        raise NotImplementedError
