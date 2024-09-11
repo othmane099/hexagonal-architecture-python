@@ -2,16 +2,16 @@ import enum
 
 from sqlalchemy import asc, desc
 
-from src.sms.core.domain.models import Brand
+from src.sms.core.domain.models import Brand, Category
 from src.sms.core.exceptions import EntityNotFound
 
 
-async def get_existed_entity_by_id(uow, brand_id: int) -> Brand:
+async def get_existed_entity_by_id(uow, entity_id: int) -> Brand | Category:
     """Uses find_by_id method which should be already existed in repository of uow passed as argument."""
-    brand = await uow.repository.find_by_id(brand_id)
-    if not brand:
+    entity = await uow.repository.find_by_id(entity_id)
+    if not entity:
         raise EntityNotFound("Brand not found with given id")
-    return brand
+    return entity
 
 
 def get_column(model, column_name: str):

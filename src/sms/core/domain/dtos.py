@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 
 from src.sms.constants import DATETIME_FORMAT, LOCAL_TIMEZONE
-from src.sms.core.domain.models import Brand, User
+from src.sms.core.domain.models import Brand, Category, User
 
 
 def convert_datetime_to_str(dt: datetime) -> str | None:
@@ -26,6 +26,9 @@ class DeleteAllByIdsResponseDTO(GlobalConfigDictMixin, BaseModel):
     not_existed_ids: list[int] | None = None
     existed_not_deleted_ids: list[int] | None = None
     deleted_ids: list[int] | None
+
+
+# ========== BRAND ==========
 
 
 class CreateBrandDTO(GlobalConfigDictMixin, BaseModel):
@@ -95,3 +98,39 @@ def convert_user_to_user_response_dto(user: User) -> UserResponseDTO:
 # ========== LOGIN ==========
 class LoginResponseDTO(BaseModel):
     access_token: str
+
+
+# ========== Category ==========
+
+
+class CreateCategoryDTO(GlobalConfigDictMixin, BaseModel):
+    code: str
+    name: str
+
+
+class UpdateCategoryDTO(GlobalConfigDictMixin, BaseModel):
+    id: int
+    code: str
+    name: str
+
+
+class CategoryResponseDTO(GlobalConfigDictMixin, BaseModel):
+    id: int
+    code: str
+    name: str
+    created_at: str
+    updated_at: str | None
+    deleted_at: str | None
+
+
+def convert_category_to_category_response_dto(
+    category: Category,
+) -> CategoryResponseDTO:
+    return CategoryResponseDTO(
+        id=category.id,
+        code=category.code,
+        name=category.name,
+        created_at=convert_datetime_to_str(category.created_at),
+        updated_at=convert_datetime_to_str(category.updated_at),
+        deleted_at=convert_datetime_to_str(category.deleted_at),
+    )

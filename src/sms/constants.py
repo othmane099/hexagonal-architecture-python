@@ -6,3 +6,4 @@ LOCAL_TIMEZONE = pytz.timezone("Africa/Algiers")
 # ================================================================================
 
 BRAND_PERMISSION = "brand"
+CATEGORY_PERMISSION = "category"

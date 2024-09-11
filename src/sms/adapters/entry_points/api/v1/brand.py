@@ -36,6 +36,7 @@ async def get_brands(
 @router.get("/{brand_id}", response_model=None)
 @inject
 async def get_brand(
+    _: Annotated[bool, Depends(has_brand_permission)],
     brand_id: int,
     brand_service_impl: BrandService = Depends(Provide["brand_service_impl"]),
 ) -> Response:
@@ -53,6 +54,7 @@ async def get_brand(
 @router.post("", response_model=None)
 @inject
 async def create(
+    _: Annotated[bool, Depends(has_brand_permission)],
     dto: CreateBrandDTO,
     brand_service_impl: BrandService = Depends(Provide["brand_service_impl"]),
 ) -> Response:
@@ -70,6 +72,7 @@ async def create(
 @router.put("", response_model=None)
 @inject
 async def update(
+    _: Annotated[bool, Depends(has_brand_permission)],
     dto: UpdateBrandDTO,
     brand_service_impl: BrandService = Depends(Provide["brand_service_impl"]),
 ) -> Response:
@@ -89,6 +92,7 @@ async def update(
 @router.delete("/{brand_id}", response_model=None)
 @inject
 async def delete(
+    _: Annotated[bool, Depends(has_brand_permission)],
     brand_id: int,
     brand_service_impl: BrandService = Depends(Provide["brand_service_impl"]),
 ) -> Response:
@@ -106,6 +110,7 @@ async def delete(
 @router.post("/delete-all-by-ids", response_model=None)
 @inject
 async def delete_all_by_ids(
+    _: Annotated[bool, Depends(has_brand_permission)],
     dto: IdsDTO,
     brand_service_impl: BrandService = Depends(Provide["brand_service_impl"]),
 ) -> Response:
