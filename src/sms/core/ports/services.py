@@ -3,10 +3,11 @@ from abc import ABC, abstractmethod
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_pagination import Page
 
-from src.sms.core.domain.dtos import (BrandResponseDTO, CreateBrandDTO,
+from src.sms.core.domain.dtos import (BrandResponseDTO, CategoryResponseDTO,
+                                      CreateBrandDTO, CreateCategoryDTO,
                                       DeleteAllByIdsResponseDTO, IdsDTO,
                                       LoginResponseDTO, UpdateBrandDTO,
-                                      UserResponseDTO)
+                                      UpdateCategoryDTO, UserResponseDTO)
 from src.sms.helpers import SortDirection
 
 
@@ -57,4 +58,37 @@ class AuthenticationService(ABC):
         self,
         form_data: OAuth2PasswordRequestForm,
     ) -> LoginResponseDTO:
+        raise NotImplementedError
+
+
+class CategoryService(ABC):
+    @abstractmethod
+    async def create(self, dto: CreateCategoryDTO) -> CategoryResponseDTO:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete(self, category_id: int) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update(self, dto: UpdateCategoryDTO) -> CategoryResponseDTO:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def find_by_id(self, category_id: int) -> CategoryResponseDTO:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def find_all(
+        self,
+        keyword: str | None,
+        page: int,
+        size: int,
+        sort_column: str,
+        sort_dir: SortDirection,
+    ) -> Page[CategoryResponseDTO]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete_all_by_ids(self, dto: IdsDTO) -> DeleteAllByIdsResponseDTO:
         raise NotImplementedError

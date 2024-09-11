@@ -79,6 +79,6 @@ def get_brand_service_impl():
     return BrandServiceImpl()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def get_user_service_impl():
     return UserServiceImpl()

@@ -15,7 +15,7 @@ from src.sms.core.exceptions import InvalidCredential
 from src.sms.core.ports.services import AuthenticationService
 from src.sms.core.ports.unit_of_works import RoleUnitOfWork, UserUnitOfWork
 
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+SECRET_KEY = "399c72082b3ed6a0956e88619a48c7912e7dc54b95d4a5a1197b0a12cc2951ba"
 ALGORITHM = "HS256"
 
 
@@ -98,6 +98,13 @@ async def has_brand_permission(
     enabled_user: Annotated[User, Depends(get_current_active_user)]
 ) -> bool:
     """Verifies if the current user's role has brand permission."""
+    return await has_permission(enabled_user.role.name, BRAND_PERMISSION)
+
+
+async def has_category_permission(
+    enabled_user: Annotated[User, Depends(get_current_active_user)]
+) -> bool:
+    """Verifies if the current user's role has category permission."""
     return await has_permission(enabled_user.role.name, BRAND_PERMISSION)
 
 
