@@ -31,7 +31,7 @@ class BrandServiceImpl(BrandService):
                 id=None,
                 name=dto.name,
                 description=dto.description,
-                created_at=datetime.now(),
+                created_at=None,
                 updated_at=None,
                 deleted_at=None,
             )

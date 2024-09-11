@@ -1,9 +1,10 @@
 from sqlalchemy import (Boolean, Column, DateTime, Enum, Float, ForeignKey,
-                        Integer, MetaData, String, Table, Text)
+                        Integer, MetaData, String, Table, Text, func)
 from sqlalchemy.orm import registry, relationship
 
-from src.sms.core.domain.models import (Brand, Category, Product, ProductType,
-                                        ProductVariant)
+from src.sms.core.domain.models import (Brand, Category, Permission, Product,
+                                        ProductType, ProductVariant, Role,
+                                        User)
 
 metadata = MetaData()
 mapper_registry = registry(metadata=metadata)
@@ -16,9 +17,9 @@ brand = Table(
     ),
     Column("name", String, nullable=False),
     Column("description", Text, nullable=True),
-    Column("created_at", DateTime, nullable=False),
-    Column("updated_at", DateTime, nullable=True),
-    Column("deleted_at", DateTime, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
 )
 
 category = Table(
@@ -29,11 +30,10 @@ category = Table(
     ),
     Column("code", String, nullable=False, unique=True),
     Column("name", String, nullable=False, unique=True),
-    Column("created_at", DateTime, nullable=False),
-    Column("updated_at", DateTime, nullable=True),
-    Column("deleted_at", DateTime, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
 )
-
 
 product = Table(
     "products",
@@ -57,9 +57,9 @@ product = Table(
     Column("has_variant", Boolean, nullable=False),
     Column("is_for_sale", Boolean, nullable=False),
     Column("is_active", Boolean, nullable=False),
-    Column("created_at", DateTime, nullable=False),
-    Column("updated_at", DateTime, nullable=True),
-    Column("deleted_at", DateTime, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
 )
 
 product_variant = Table(
@@ -75,9 +75,65 @@ product_variant = Table(
     Column("code", String, nullable=False),
     Column("image", String, nullable=True),
     Column("qty", Float, nullable=False),
-    Column("created_at", DateTime, nullable=False),
-    Column("updated_at", DateTime, nullable=True),
-    Column("deleted_at", DateTime, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
+)
+
+permission = Table(
+    "permissions",
+    mapper_registry.metadata,
+    Column(
+        "id", Integer, primary_key=True, unique=True, nullable=False, autoincrement=True
+    ),
+    Column("name", String, nullable=False, unique=True),
+    Column("label", String, nullable=False, unique=True),
+    Column("description", Text, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
+)
+
+role = Table(
+    "roles",
+    mapper_registry.metadata,
+    Column(
+        "id", Integer, primary_key=True, unique=True, nullable=False, autoincrement=True
+    ),
+    Column("name", String, nullable=False, unique=True),
+    Column("label", String, nullable=False, unique=True),
+    Column("description", Text, nullable=True),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
+)
+
+user = Table(
+    "users",
+    mapper_registry.metadata,
+    Column(
+        "id", Integer, primary_key=True, unique=True, nullable=False, autoincrement=True
+    ),
+    Column("role_id", Integer, ForeignKey("roles.id"), nullable=False),
+    Column("firstname", String, nullable=False),
+    Column("lastname", String, nullable=False),
+    Column("username", String, nullable=False),
+    Column("email", String, nullable=False),
+    Column("password", String, nullable=False),
+    Column("phone", String, nullable=False),
+    Column("is_active", Boolean, nullable=False),
+    Column("created_at", DateTime(timezone=True), default=func.now(), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=True),
+    Column("deleted_at", DateTime(timezone=True), nullable=True),
+)
+
+# ==== Many to many ====
+
+role_permission_association = Table(
+    "roles_permissions",
+    mapper_registry.metadata,
+    Column("role_id", Integer, ForeignKey("roles.id"), primary_key=True),
+    Column("permission_id", Integer, ForeignKey("permissions.id"), primary_key=True),
 )
 
 
@@ -110,5 +166,35 @@ def start_mappers():
         product_variant,
         properties={
             "product": relationship("Product", back_populates="variants"),
+        },
+    )
+    mapper_registry.map_imperatively(
+        Permission,
+        permission,
+        properties={
+            "roles": relationship(
+                "Role",
+                secondary=role_permission_association,
+                back_populates="permissions",
+            ),
+        },
+    )
+    mapper_registry.map_imperatively(
+        Role,
+        role,
+        properties={
+            "permissions": relationship(
+                "Permission",
+                secondary=role_permission_association,
+                back_populates="roles",
+            ),
+            "users": relationship("User", back_populates="role"),
+        },
+    )
+    mapper_registry.map_imperatively(
+        User,
+        user,
+        properties={
+            "role": relationship("Role", back_populates="users"),
         },
     )

@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 
 from src.sms.constants import DATETIME_FORMAT, LOCAL_TIMEZONE
-from src.sms.core.domain.models import Brand
+from src.sms.core.domain.models import Brand, User
 
 
 def convert_datetime_to_str(dt: datetime) -> str | None:
@@ -57,3 +57,41 @@ def convert_brand_to_brand_response_dto(brand: Brand) -> BrandResponseDTO:
         updated_at=convert_datetime_to_str(brand.updated_at),
         deleted_at=convert_datetime_to_str(brand.deleted_at),
     )
+
+
+# ========== USER ==========
+
+
+class UserResponseDTO(GlobalConfigDictMixin, BaseModel):
+    id: int
+    role_id: int
+    firstname: str
+    lastname: str
+    username: str
+    email: str
+    phone: str
+    is_active: bool
+    created_at: str
+    updated_at: str | None
+    deleted_at: str | None
+
+
+def convert_user_to_user_response_dto(user: User) -> UserResponseDTO:
+    return UserResponseDTO(
+        id=user.id,
+        role_id=user.role_id,
+        firstname=user.firstname,
+        lastname=user.lastname,
+        username=user.username,
+        email=user.email,
+        phone=user.phone,
+        is_active=user.is_active,
+        created_at=convert_datetime_to_str(user.created_at),
+        updated_at=convert_datetime_to_str(user.updated_at),
+        deleted_at=convert_datetime_to_str(user.deleted_at),
+    )
+
+
+# ========== LOGIN ==========
+class LoginResponseDTO(BaseModel):
+    access_token: str

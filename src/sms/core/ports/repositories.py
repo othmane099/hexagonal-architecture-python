@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from sqlalchemy import Select
 
-from src.sms.core.domain.models import Brand
+from src.sms.core.domain.models import Brand, Role, User
 from src.sms.helpers import SortDirection
 
 
@@ -27,4 +27,23 @@ class BrandRepository(ABC):
 
     @abstractmethod
     async def find_all_by_ids(self, ids: list[int]) -> list[Brand]:
+        raise NotImplementedError
+
+
+class UserRepository(ABC):
+
+    @abstractmethod
+    async def find_by_username(self, username: str) -> User | None:
+        raise NotImplementedError
+
+
+class RoleRepository(ABC):
+
+    @abstractmethod
+    async def find_by_name(self, name: str) -> Role | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def role_has_permission(self, role_name: str, permission_name: str) -> bool:
+        """Check if a role has a permission."""
         raise NotImplementedError

@@ -6,7 +6,7 @@ from enum import Enum
 @dataclass
 class BaseEntityMixin:
     id: int | None
-    created_at: datetime
+    created_at: datetime | None
     updated_at: datetime | None
     deleted_at: datetime | None
 
@@ -60,3 +60,30 @@ class Product(BaseEntityMixin):
     has_variant: bool
     is_for_sale: bool
     is_active: bool
+
+
+@dataclass
+class Permission(BaseEntityMixin):
+    name: str
+    label: str
+    description: str | None
+
+
+@dataclass
+class Role(BaseEntityMixin):
+    name: str
+    label: str
+    description: str | None
+
+
+@dataclass
+class User(BaseEntityMixin):
+    role_id: int
+    firstname: str
+    lastname: str
+    username: str
+    email: str
+    password: str
+    phone: str
+    is_active: bool
+    role: Role

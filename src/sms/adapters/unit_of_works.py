@@ -3,6 +3,8 @@ from typing import Any, Callable
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.sms.adapters.repositories.brand import BrandRepositoryImpl
+from src.sms.adapters.repositories.role import RoleRepositoryImpl
+from src.sms.adapters.repositories.user import UserRepositoryImpl
 from src.sms.core.ports.unit_of_works import UnitOfWork
 
 
@@ -31,4 +33,20 @@ class BrandUnitOfWorkImpl(UnitOfWorkImpl):
     async def __aenter__(self):
         await super().__aenter__()
         self.repository = BrandRepositoryImpl(self.session)
+        return self
+
+
+class UserUnitOfWorkImpl(UnitOfWorkImpl):
+
+    async def __aenter__(self):
+        await super().__aenter__()
+        self.repository = UserRepositoryImpl(self.session)
+        return self
+
+
+class RoleUnitOfWorkImpl(UnitOfWorkImpl):
+
+    async def __aenter__(self):
+        await super().__aenter__()
+        self.repository = RoleRepositoryImpl(self.session)
         return self

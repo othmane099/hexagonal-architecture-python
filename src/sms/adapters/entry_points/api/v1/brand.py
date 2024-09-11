@@ -1,4 +1,5 @@
 import json
+from typing import Annotated
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, Response
@@ -9,6 +10,7 @@ from src.sms.core.domain.dtos import (BrandResponseDTO, CreateBrandDTO,
                                       UpdateBrandDTO)
 from src.sms.core.exceptions import EntityNotFound, UniqueViolation
 from src.sms.core.ports.services import BrandService
+from src.sms.core.services.security import has_brand_permission
 from src.sms.helpers import SortDirection
 
 router = APIRouter()
@@ -17,6 +19,7 @@ router = APIRouter()
 @router.get("", response_model=Page[BrandResponseDTO])
 @inject
 async def get_brands(
+    _: Annotated[bool, Depends(has_brand_permission)],
     keyword: str | None = None,
     page: int = 1,
     size: int = 20,
@@ -39,7 +42,7 @@ async def get_brand(
     try:
         response = await brand_service_impl.find_by_id(brand_id)
     except EntityNotFound as e:
-        raise HTTPException(status_code=404, detail=e.message)
+        raise HTTPException(status_code=404, detail=str(e))
     return Response(
         content=json.dumps({"data": BrandResponseDTO.model_dump(response)}),
         media_type="application/json",
@@ -56,7 +59,7 @@ async def create(
     try:
         response = await brand_service_impl.create(dto)
     except UniqueViolation as e:
-        raise HTTPException(status_code=409, detail=e.message)
+        raise HTTPException(status_code=409, detail=str(e))
     return Response(
         content=json.dumps({"data": BrandResponseDTO.model_dump(response)}),
         media_type="application/json",
@@ -73,9 +76,9 @@ async def update(
     try:
         response = await brand_service_impl.update(dto)
     except EntityNotFound as e:
-        raise HTTPException(status_code=404, detail=e.message)
+        raise HTTPException(status_code=404, detail=str(e))
     except UniqueViolation as e:
-        raise HTTPException(status_code=409, detail=e.message)
+        raise HTTPException(status_code=409, detail=str(e))
     return Response(
         content=json.dumps({"data": BrandResponseDTO.model_dump(response)}),
         media_type="application/json",
@@ -92,7 +95,7 @@ async def delete(
     try:
         await brand_service_impl.delete(brand_id)
     except EntityNotFound as e:
-        raise HTTPException(status_code=404, detail=e.message)
+        raise HTTPException(status_code=404, detail=str(e))
     return Response(
         content=json.dumps({"detail": "Brand deleted successfully"}),
         media_type="application/json",

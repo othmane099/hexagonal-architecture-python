@@ -6,7 +6,7 @@ from src.sms.helpers import SortDirection
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_create_brand(get_brand_service_impl, init_container):
+async def test_create_brand(get_brand_service_impl):
     dto = CreateBrandDTO(
         name="service_brand_name", description="service_brand_description"
     )
