@@ -86,3 +86,4 @@ class User(BaseEntityMixin):
     password: str
     phone: str
     is_active: bool
+    role: Role

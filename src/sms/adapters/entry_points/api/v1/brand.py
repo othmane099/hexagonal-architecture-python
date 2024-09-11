@@ -1,4 +1,5 @@
 import json
+from typing import Annotated
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, Response
@@ -9,6 +10,7 @@ from src.sms.core.domain.dtos import (BrandResponseDTO, CreateBrandDTO,
                                       UpdateBrandDTO)
 from src.sms.core.exceptions import EntityNotFound, UniqueViolation
 from src.sms.core.ports.services import BrandService
+from src.sms.core.services.security import has_brand_permission
 from src.sms.helpers import SortDirection
 
 router = APIRouter()
@@ -17,6 +19,7 @@ router = APIRouter()
 @router.get("", response_model=Page[BrandResponseDTO])
 @inject
 async def get_brands(
+    _: Annotated[bool, Depends(has_brand_permission)],
     keyword: str | None = None,
     page: int = 1,
     size: int = 20,

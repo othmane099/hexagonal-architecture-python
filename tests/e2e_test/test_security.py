@@ -10,7 +10,7 @@ client = TestClient(app)
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_login(init_owner):
+async def test_login():
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:

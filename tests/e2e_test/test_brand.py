@@ -47,29 +47,56 @@ async def test_update(get_brand_service_impl):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_get_brands(get_brand_service_impl):
+async def test_get_brands(get_brand_service_impl, get_user_service_impl, init_owner):
+    test_owner = await get_user_service_impl.find_by_username("test_owner")
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1"
+    ) as ac:
+        response = await ac.post(
+            "/token", data={"username": test_owner.username, "password": "123456"}
+        )
+        assert response.status_code == 200
+        access_token = response.json()["access_token"]
+
     brands = await get_brand_service_impl.find_all(
         keyword=None, page=1, size=10, sort_column="name", sort_dir=SortDirection.ASC
     )
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
-        response = await ac.get("/api/v1/brands?page=1&size=10")
+        response = await ac.get(
+            "/api/v1/brands?page=1&size=10",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
         assert response.status_code == 200
         assert len(response.json()["items"]) == len(brands.items)
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_get_brands_sorting_and_direction(get_brand_service_impl):
+async def test_get_brands_sorting_and_direction(
+    get_brand_service_impl, get_user_service_impl
+):
     dto = CreateBrandDTO(name="one_more_brand", description=None)
     await get_brand_service_impl.create(dto)
     dto = CreateBrandDTO(name="one_more_brand1", description=None)
     await get_brand_service_impl.create(dto)
+
+    test_owner = await get_user_service_impl.find_by_username("test_owner")
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1"
+    ) as ac:
+        response = await ac.post(
+            "/token", data={"username": test_owner.username, "password": "123456"}
+        )
+        assert response.status_code == 200
+        access_token = response.json()["access_token"]
+
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
         response = await ac.get(
-            "/api/v1/brands?page=1&size=10&sort_column=id&sort_dir=asc"
+            "/api/v1/brands?page=1&size=10&sort_column=id&sort_dir=asc",
+            headers={"Authorization": f"Bearer {access_token}"},
         )
         items = response.json()["items"]
         first_item = items[0]
@@ -81,7 +108,8 @@ async def test_get_brands_sorting_and_direction(get_brand_service_impl):
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
         response = await ac.get(
-            "/api/v1/brands?page=1&size=10&sort_column=id&sort_dir=desc"
+            "/api/v1/brands?page=1&size=10&sort_column=id&sort_dir=desc",
+            headers={"Authorization": f"Bearer {access_token}"},
         )
         items = response.json()["items"]
         first_item = items[0]
@@ -91,23 +119,40 @@ async def test_get_brands_sorting_and_direction(get_brand_service_impl):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_get_brands__search_by_keyword(get_brand_service_impl):
+async def test_get_brands__search_by_keyword(
+    get_brand_service_impl, get_user_service_impl
+):
     dto = CreateBrandDTO(name="other_brand", description=None)
     b1 = await get_brand_service_impl.create(dto)
     dto = CreateBrandDTO(name="other_brand1", description="other_brand_description")
     b2 = await get_brand_service_impl.create(dto)
+    test_owner = await get_user_service_impl.find_by_username("test_owner")
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1"
+    ) as ac:
+        response = await ac.post(
+            "/token", data={"username": test_owner.username, "password": "123456"}
+        )
+        assert response.status_code == 200
+        access_token = response.json()["access_token"]
     # Search by keyword = other_brand
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
-        response = await ac.get("/api/v1/brands?page=1&size=10&keyword=other_brand")
+        response = await ac.get(
+            "/api/v1/brands?page=1&size=10&keyword=other_brand",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
         assert response.status_code == 200
         assert len(response.json()["items"]) == 2
     # Search by not existed keyword
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
-        response = await ac.get("/api/v1/brands?page=1&size=10&keyword=random")
+        response = await ac.get(
+            "/api/v1/brands?page=1&size=10&keyword=random",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
         assert response.status_code == 200
         assert len(response.json()["items"]) == 0
     # Search by description keyword
@@ -115,7 +160,8 @@ async def test_get_brands__search_by_keyword(get_brand_service_impl):
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
         response = await ac.get(
-            "/api/v1/brands?page=1&size=10&keyword=other_brand_description"
+            "/api/v1/brands?page=1&size=10&keyword=other_brand_description",
+            headers={"Authorization": f"Bearer {access_token}"},
         )
         assert response.status_code == 200
         assert len(response.json()["items"]) == 1
@@ -123,7 +169,10 @@ async def test_get_brands__search_by_keyword(get_brand_service_impl):
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
-        response = await ac.get("/api/v1/brands?page=1&size=10&keyword=other_brand1")
+        response = await ac.get(
+            "/api/v1/brands?page=1&size=10&keyword=other_brand1",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
         assert response.status_code == 200
         assert len(response.json()["items"]) == 1
 

@@ -28,10 +28,11 @@ def test_verify_password():
 
 
 def test_create_access_token():
-    data = {"sub": "testuser"}
+    data = {"sub": "testuser", "role": "testowner"}
     token = create_access_token(data)
     decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     assert decoded_data["sub"] == "testuser"
+    assert decoded_data["role"] == "testowner"
     assert "exp" in decoded_data
     assert datetime.fromtimestamp(decoded_data["exp"], timezone.utc) > datetime.now(
         timezone.utc
@@ -40,9 +41,12 @@ def test_create_access_token():
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_authenticate_success(mocker):
+    mock_role = mocker.Mock()
+    mock_role.name = "testowner"
     mock_user = mocker.Mock()
     mock_user.username = "testuser"
     mock_user.password = hash_password("testpassword")
+    mock_user.role = mock_role
     mock_repository = mocker.AsyncMock()
     mock_repository.find_by_username.return_value = mock_user
     mock_uow = mocker.Mock(spec=UserUnitOfWork)

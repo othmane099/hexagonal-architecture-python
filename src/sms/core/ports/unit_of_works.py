@@ -1,6 +1,7 @@
 from abc import ABC, ABCMeta, abstractmethod
 
-from src.sms.core.ports.repositories import BrandRepository, UserRepository
+from src.sms.core.ports.repositories import (BrandRepository, RoleRepository,
+                                             UserRepository)
 
 
 class UnitOfWork(ABC, metaclass=ABCMeta):
@@ -26,3 +27,7 @@ class BrandUnitOfWork(UnitOfWork, metaclass=ABCMeta):
 
 class UserUnitOfWork(UnitOfWork, metaclass=ABCMeta):
     repository: UserRepository
+
+
+class RoleUnitOfWork(UnitOfWork, metaclass=ABCMeta):
+    repository: RoleRepository
