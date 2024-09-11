@@ -10,12 +10,25 @@ client = TestClient(app)
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_create(drop_and_create_database):
+async def test_create(drop_and_create_database, get_user_service_impl, init_owner):
     dto = CreateBrandDTO(name="e2e_brand_name", description="e2e_brand_description")
+    test_owner = await get_user_service_impl.find_by_username("test_owner")
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
-        response = await ac.post("/api/v1/brands", json=CreateBrandDTO.model_dump(dto))
+        response = await ac.post(
+            "/token", data={"username": test_owner.username, "password": "123456"}
+        )
+        assert response.status_code == 200
+        access_token = response.json()["access_token"]
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1"
+    ) as ac:
+        response = await ac.post(
+            "/api/v1/brands",
+            json=CreateBrandDTO.model_dump(dto),
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
         assert response.status_code == 200
         assert response.json()["data"]["id"] is not None
         assert response.json()["data"]["name"] == dto.name
@@ -24,7 +37,7 @@ async def test_create(drop_and_create_database):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_update(get_brand_service_impl):
+async def test_update(get_brand_service_impl, get_user_service_impl):
     brands = await get_brand_service_impl.find_all(
         keyword=None, page=1, size=10, sort_column="name", sort_dir=SortDirection.ASC
     )
@@ -34,10 +47,23 @@ async def test_update(get_brand_service_impl):
         name="updated_e2e_brand_name",
         description=existed_brand.description,
     )
+    test_owner = await get_user_service_impl.find_by_username("test_owner")
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
-        response = await ac.put("/api/v1/brands", json=UpdateBrandDTO.model_dump(dto))
+        response = await ac.post(
+            "/token", data={"username": test_owner.username, "password": "123456"}
+        )
+        assert response.status_code == 200
+        access_token = response.json()["access_token"]
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1"
+    ) as ac:
+        response = await ac.put(
+            "/api/v1/brands",
+            json=UpdateBrandDTO.model_dump(dto),
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
         assert response.status_code == 200
         assert response.json()["data"]["id"] == dto.id
         assert response.json()["data"]["name"] == dto.name
@@ -47,7 +73,7 @@ async def test_update(get_brand_service_impl):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_get_brands(get_brand_service_impl, get_user_service_impl, init_owner):
+async def test_get_brands(get_brand_service_impl, get_user_service_impl):
     test_owner = await get_user_service_impl.find_by_username("test_owner")
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
@@ -178,12 +204,24 @@ async def test_get_brands__search_by_keyword(
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_get_brand(get_brand_service_impl):
+async def test_get_brand(get_brand_service_impl, get_user_service_impl):
     brand = await get_brand_service_impl.find_by_id(1)
+    test_owner = await get_user_service_impl.find_by_username("test_owner")
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
-        response = await ac.get("/api/v1/brands/1")
+        response = await ac.post(
+            "/token", data={"username": test_owner.username, "password": "123456"}
+        )
+        assert response.status_code == 200
+        access_token = response.json()["access_token"]
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1"
+    ) as ac:
+        response = await ac.get(
+            "/api/v1/brands/1",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
         assert response.status_code == 200
         assert response.json()["data"]["id"] == brand.id
         assert response.json()["data"]["name"] == brand.name
@@ -192,14 +230,26 @@ async def test_get_brand(get_brand_service_impl):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_delete(get_brand_service_impl):
+async def test_delete(get_brand_service_impl, get_user_service_impl):
     existed_brand_before_delete = await get_brand_service_impl.find_all(
         keyword=None, page=1, size=10, sort_column="name", sort_dir=SortDirection.ASC
     )
+    test_owner = await get_user_service_impl.find_by_username("test_owner")
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
-        response = await ac.delete("/api/v1/brands/1")
+        response = await ac.post(
+            "/token", data={"username": test_owner.username, "password": "123456"}
+        )
+        assert response.status_code == 200
+        access_token = response.json()["access_token"]
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1"
+    ) as ac:
+        response = await ac.delete(
+            "/api/v1/brands/1",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
         assert response.status_code == 200
         assert response.json()["detail"] == "Brand deleted successfully"
 
@@ -213,7 +263,7 @@ async def test_delete(get_brand_service_impl):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_delete_all_by_ids(get_brand_service_impl):
+async def test_delete_all_by_ids(get_brand_service_impl, get_user_service_impl):
     dto = CreateBrandDTO(name="test_delete_all_by_ids", description=None)
     b1 = await get_brand_service_impl.create(dto)
     dto = CreateBrandDTO(name="test_delete_all_by_ids1", description=None)
@@ -225,11 +275,22 @@ async def test_delete_all_by_ids(get_brand_service_impl):
     existed_brand_before_delete = await get_brand_service_impl.find_all(
         keyword=None, page=1, size=10, sort_column="name", sort_dir=SortDirection.ASC
     )
+    test_owner = await get_user_service_impl.find_by_username("test_owner")
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as ac:
         response = await ac.post(
-            "/api/v1/brands/delete-all-by-ids", json=IdsDTO.model_dump(dto)
+            "/token", data={"username": test_owner.username, "password": "123456"}
+        )
+        assert response.status_code == 200
+        access_token = response.json()["access_token"]
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1"
+    ) as ac:
+        response = await ac.post(
+            "/api/v1/brands/delete-all-by-ids",
+            json=IdsDTO.model_dump(dto),
+            headers={"Authorization": f"Bearer {access_token}"},
         )
         assert response.status_code == 200
         assert response.json()["data"]["not_existed_ids"] == [999]
