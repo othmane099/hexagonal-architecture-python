@@ -43,9 +43,6 @@ class ProductType(str, Enum):
 class Product(BaseEntityMixin):
     category_id: int
     brand_id: int | None
-    unit_id: int
-    unit_sale_id: int
-    unit_purchase_id: int
     type: ProductType
     code: str
     name: str
