@@ -6,9 +6,9 @@ from src.sms.core.domain.models import Brand, Category
 from src.sms.core.exceptions import EntityNotFound
 
 
-async def get_existed_entity_by_id(uow, entity_id: int) -> Brand | Category:
+async def get_existed_entity_by_id(repository, entity_id: int) -> Brand | Category:
     """Uses find_by_id method which should be already existed in repository of uow passed as argument."""
-    entity = await uow.repository.find_by_id(entity_id)
+    entity = await repository.find_by_id(entity_id)
     if not entity:
         raise EntityNotFound("Brand not found with given id")
     return entity

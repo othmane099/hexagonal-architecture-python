@@ -2,10 +2,7 @@ from dependency_injector import containers, providers
 from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
                                     create_async_engine)
 
-from src.sms.adapters.unit_of_works import (BrandUnitOfWorkImpl,
-                                            CategoryUnitOfWorkImpl,
-                                            RoleUnitOfWorkImpl,
-                                            UserUnitOfWorkImpl)
+from src.sms.adapters.unit_of_works import UnitOfWorkImpl
 from src.sms.config.settings import get_database_uri
 from src.sms.core.services.brand import BrandServiceImpl
 from src.sms.core.services.category import CategoryServiceImpl
@@ -25,35 +22,23 @@ class Container(containers.DeclarativeContainer):
         bind=ENGINE, autocommit=False, expire_on_commit=False, class_=AsyncSession
     )
 
-    brand_unit_of_work = providers.Factory(
-        BrandUnitOfWorkImpl, session_factory=DEFAULT_SESSION_FACTORY
+    unit_of_work = providers.Factory(
+        UnitOfWorkImpl, session_factory=DEFAULT_SESSION_FACTORY
     )
 
     brand_service_impl = providers.Factory(
         BrandServiceImpl,
-        brand_unit_of_work=brand_unit_of_work,
-    )
-
-    category_unit_of_work = providers.Factory(
-        CategoryUnitOfWorkImpl, session_factory=DEFAULT_SESSION_FACTORY
+        unit_of_work=unit_of_work,
     )
 
     category_service_impl = providers.Factory(
         CategoryServiceImpl,
-        category_unit_of_work=category_unit_of_work,
-    )
-
-    user_unit_of_work = providers.Factory(
-        UserUnitOfWorkImpl, session_factory=DEFAULT_SESSION_FACTORY
+        unit_of_work=unit_of_work,
     )
 
     user_service_impl = providers.Factory(
         UserServiceImpl,
-        user_unit_of_work=user_unit_of_work,
+        unit_of_work=unit_of_work,
     )
 
     authentication_service_impl = providers.Factory(AuthenticationServiceImpl)
-
-    role_unit_of_work = providers.Factory(
-        RoleUnitOfWorkImpl, session_factory=DEFAULT_SESSION_FACTORY
-    )

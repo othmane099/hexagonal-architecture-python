@@ -13,7 +13,7 @@ from src.sms.core.domain.dtos import LoginResponseDTO
 from src.sms.core.domain.models import User
 from src.sms.core.exceptions import InvalidCredential
 from src.sms.core.ports.services import AuthenticationService
-from src.sms.core.ports.unit_of_works import RoleUnitOfWork, UserUnitOfWork
+from src.sms.core.ports.unit_of_works import UnitOfWork
 
 SECRET_KEY = "399c72082b3ed6a0956e88619a48c7912e7dc54b95d4a5a1197b0a12cc2951ba"
 ALGORITHM = "HS256"
@@ -42,20 +42,20 @@ def create_access_token(data: dict):
 
 @inject
 async def load_user_by_username(
-    username: str, user_unit_of_work: UserUnitOfWork = Provide["user_unit_of_work"]
+    username: str, unit_of_work: UnitOfWork = Provide["unit_of_work"]
 ) -> User | None:
-    async with user_unit_of_work as uow:
-        return await uow.repository.find_by_username(username)
+    async with unit_of_work as uow:
+        return await uow.user_repository.find_by_username(username)
 
 
 @inject
 async def has_permission(
     role_name: str,
     permission_name: str,
-    role_unit_of_work: RoleUnitOfWork = Provide["role_unit_of_work"],
+    unit_of_work: UnitOfWork = Provide["unit_of_work"],
 ) -> bool:
-    async with role_unit_of_work as uow:
-        return await uow.repository.role_has_permission(role_name, permission_name)
+    async with unit_of_work as uow:
+        return await uow.role_repository.role_has_permission(role_name, permission_name)
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

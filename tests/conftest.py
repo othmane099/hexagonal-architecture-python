@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.sms.adapters.db.orm import metadata, start_mappers
 from src.sms.config.containers import ENGINE, Container
 from src.sms.core.domain.models import Permission, Role, User
-from src.sms.core.ports.services import CategoryService
 from src.sms.core.services.brand import BrandServiceImpl
 from src.sms.core.services.category import CategoryServiceImpl
 from src.sms.core.services.security import hash_password

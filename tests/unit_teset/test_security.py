@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from src.sms.core.domain.dtos import LoginResponseDTO
 from src.sms.core.exceptions import InvalidCredential
-from src.sms.core.ports.unit_of_works import UserUnitOfWork
+from src.sms.core.ports.unit_of_works import UnitOfWork
 from src.sms.core.services.security import (ALGORITHM, SECRET_KEY,
                                             AuthenticationServiceImpl,
                                             create_access_token, hash_password,
@@ -49,7 +49,7 @@ async def test_authenticate_success(mocker):
     mock_user.role = mock_role
     mock_repository = mocker.AsyncMock()
     mock_repository.find_by_username.return_value = mock_user
-    mock_uow = mocker.Mock(spec=UserUnitOfWork)
+    mock_uow = mocker.Mock(spec=UnitOfWork)
     mock_uow.repository = mock_repository
     mocker.patch(
         "src.sms.core.services.security.load_user_by_username", return_value=mock_user
@@ -68,7 +68,7 @@ async def test_authenticate_success(mocker):
 async def test_authenticate_invalid_credentials(mocker):
     mock_repository = mocker.AsyncMock()
     mock_repository.find_by_username.return_value = None
-    mock_uow = mocker.Mock(spec=UserUnitOfWork)
+    mock_uow = mocker.Mock(spec=UnitOfWork)
     mock_uow.repository = mock_repository
     mocker.patch(
         "src.sms.core.services.security.load_user_by_username", return_value=None

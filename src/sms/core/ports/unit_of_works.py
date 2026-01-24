@@ -1,4 +1,3 @@
-from abc import ABCMeta
 from typing import Protocol
 
 from src.sms.core.ports.repositories import (BrandRepository,
@@ -7,31 +6,15 @@ from src.sms.core.ports.repositories import (BrandRepository,
 
 
 class UnitOfWork(Protocol):
-    async def __aenter__(self):
-        return self
+    brand_repository: BrandRepository
+    user_repository: UserRepository
+    role_repository: RoleRepository
+    category_repository: CategoryRepository
 
-    async def __aexit__(self, exc_type, exc_val, traceback):
-        if exc_type is not None:
-            await self.rollback()
+    async def __aenter__(self) -> "UnitOfWork": ...
 
-    async def commit(self):
-        ...
+    async def __aexit__(self, exc_type, exc_val, traceback): ...
 
-    async def rollback(self):
-        ...
+    async def commit(self): ...
 
-
-class BrandUnitOfWork(UnitOfWork, metaclass=ABCMeta):
-    repository: BrandRepository
-
-
-class UserUnitOfWork(UnitOfWork, metaclass=ABCMeta):
-    repository: UserRepository
-
-
-class RoleUnitOfWork(UnitOfWork, metaclass=ABCMeta):
-    repository: RoleRepository
-
-
-class CategoryUnitOfWork(UnitOfWork, metaclass=ABCMeta):
-    repository: CategoryRepository
+    async def rollback(self): ...
