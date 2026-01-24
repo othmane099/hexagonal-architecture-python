@@ -36,6 +36,7 @@ src/sms/
 - **Dependency Injection**: Uses `dependency-injector` library to decouple core business logic from infrastructure code. This makes the core logic independent of external systems, which can be easily swapped or modified without affecting the core.
 - **Unit of Work**: Transaction management via async context managers.
 - **Soft Deletes**: All entities have `deleted_at` field for logical deletion.
+- **Fakes for Testing**: In-memory fake implementations of repositories in `adapters/repositories/fakes/` for unit testing services without a database.
 
 ## Database
 
