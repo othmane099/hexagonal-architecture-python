@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from typing import Protocol
 
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_pagination import Page
@@ -11,24 +11,15 @@ from src.sms.core.domain.dtos import (BrandResponseDTO, CategoryResponseDTO,
 from src.sms.helpers import SortDirection
 
 
-class BrandService(ABC):
-    @abstractmethod
-    async def create(self, dto: CreateBrandDTO) -> BrandResponseDTO:
-        raise NotImplementedError
+class BrandService(Protocol):
+    async def create(self, dto: CreateBrandDTO) -> BrandResponseDTO: ...
 
-    @abstractmethod
-    async def delete(self, brand_id: int) -> None:
-        raise NotImplementedError
+    async def delete(self, brand_id: int) -> None: ...
 
-    @abstractmethod
-    async def update(self, dto: UpdateBrandDTO) -> BrandResponseDTO:
-        raise NotImplementedError
+    async def update(self, dto: UpdateBrandDTO) -> BrandResponseDTO: ...
 
-    @abstractmethod
-    async def find_by_id(self, brand_id: int) -> BrandResponseDTO:
-        raise NotImplementedError
+    async def find_by_id(self, brand_id: int) -> BrandResponseDTO: ...
 
-    @abstractmethod
     async def find_all(
         self,
         keyword: str | None,
@@ -36,49 +27,33 @@ class BrandService(ABC):
         size: int,
         sort_column: str,
         sort_dir: SortDirection,
-    ) -> Page[BrandResponseDTO]:
-        raise NotImplementedError
+    ) -> Page[BrandResponseDTO]: ...
 
-    @abstractmethod
-    async def delete_all_by_ids(self, dto: IdsDTO) -> DeleteAllByIdsResponseDTO:
-        raise NotImplementedError
+    async def delete_all_by_ids(self, dto: IdsDTO) -> DeleteAllByIdsResponseDTO: ...
 
 
-class UserService(ABC):
+class UserService(Protocol):
 
-    @abstractmethod
-    async def find_by_username(self, username: str) -> UserResponseDTO:
-        raise NotImplementedError
+    async def find_by_username(self, username: str) -> UserResponseDTO: ...
 
 
-class AuthenticationService(ABC):
+class AuthenticationService(Protocol):
 
-    @abstractmethod
     async def authenticate(
         self,
         form_data: OAuth2PasswordRequestForm,
-    ) -> LoginResponseDTO:
-        raise NotImplementedError
+    ) -> LoginResponseDTO: ...
 
 
-class CategoryService(ABC):
-    @abstractmethod
-    async def create(self, dto: CreateCategoryDTO) -> CategoryResponseDTO:
-        raise NotImplementedError
+class CategoryService(Protocol):
+    async def create(self, dto: CreateCategoryDTO) -> CategoryResponseDTO: ...
 
-    @abstractmethod
-    async def delete(self, category_id: int) -> None:
-        raise NotImplementedError
+    async def delete(self, category_id: int) -> None: ...
 
-    @abstractmethod
-    async def update(self, dto: UpdateCategoryDTO) -> CategoryResponseDTO:
-        raise NotImplementedError
+    async def update(self, dto: UpdateCategoryDTO) -> CategoryResponseDTO: ...
 
-    @abstractmethod
-    async def find_by_id(self, category_id: int) -> CategoryResponseDTO:
-        raise NotImplementedError
+    async def find_by_id(self, category_id: int) -> CategoryResponseDTO: ...
 
-    @abstractmethod
     async def find_all(
         self,
         keyword: str | None,
@@ -86,9 +61,6 @@ class CategoryService(ABC):
         size: int,
         sort_column: str,
         sort_dir: SortDirection,
-    ) -> Page[CategoryResponseDTO]:
-        raise NotImplementedError
+    ) -> Page[CategoryResponseDTO]: ...
 
-    @abstractmethod
-    async def delete_all_by_ids(self, dto: IdsDTO) -> DeleteAllByIdsResponseDTO:
-        raise NotImplementedError
+    async def delete_all_by_ids(self, dto: IdsDTO) -> DeleteAllByIdsResponseDTO: ...

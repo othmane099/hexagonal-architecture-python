@@ -1,11 +1,12 @@
-from abc import ABC, ABCMeta, abstractmethod
+from abc import ABCMeta
+from typing import Protocol
 
 from src.sms.core.ports.repositories import (BrandRepository,
                                              CategoryRepository,
                                              RoleRepository, UserRepository)
 
 
-class UnitOfWork(ABC, metaclass=ABCMeta):
+class UnitOfWork(Protocol):
     async def __aenter__(self):
         return self
 
@@ -13,13 +14,11 @@ class UnitOfWork(ABC, metaclass=ABCMeta):
         if exc_type is not None:
             await self.rollback()
 
-    @abstractmethod
     async def commit(self):
-        raise NotImplementedError
+        ...
 
-    @abstractmethod
     async def rollback(self):
-        raise NotImplementedError
+        ...
 
 
 class BrandUnitOfWork(UnitOfWork, metaclass=ABCMeta):
