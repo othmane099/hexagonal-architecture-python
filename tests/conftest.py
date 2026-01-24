@@ -3,7 +3,8 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.sms.adapters.db.orm import metadata, start_mappers
-from src.sms.config.containers import ENGINE, Container
+from src.sms.config.containers import Container
+from src.sms.adapters.db.core import ENGINE
 from src.sms.core.domain.models import Permission, Role, User
 from src.sms.core.services.brand import BrandServiceImpl
 from src.sms.core.services.category import CategoryServiceImpl

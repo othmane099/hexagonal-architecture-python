@@ -7,7 +7,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from src.sms.adapters.db import orm
-from src.sms.config.containers import db_uri
+from sms.adapters.db.core import db_uri
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
